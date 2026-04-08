@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>멘하우스 키오스크</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="hero-kicker">RAMEN KIOSK EXPERIENCE</p>
+        <h1>멘하우스 라멘 스테이션</h1>
+        <p class="hero-text">
+          카드를 끌어서 그릇에 담거나 버튼으로 바로 주문해보세요.
+          라멘은 맵기와 면 상태까지 세밀하게 고를 수 있고, 담길수록 그릇 속 국물도 진해집니다.
+        </p>
+      </div>
+      <div class="hero-badges">
+        <span>드래그 앤 드롭</span>
+        <span>라멘 전용 맵기 팝업</span>
+        <span>실시간 주문 합계</span>
+      </div>
+      <button class="staff-call" id="staffCallButton" type="button">직원 호출</button>
+    </header>
+
+    <main class="kiosk-layout">
+      <section class="menu-panel panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">MENU SELECTOR</p>
+            <h2>메뉴 고르기</h2>
+            <p class="panel-note">카드 자체를 끌어 그릇으로 옮기거나 버튼으로 바로 담을 수 있어요.</p>
+          </div>
+          <div class="category-tabs" id="categoryTabs" aria-label="메뉴 카테고리"></div>
+        </div>
+        <div class="menu-stage">
+          <div class="menu-grid" id="menuGrid"></div>
+          <div class="menu-footer">
+            <button class="text-button random-button" id="randomPickButton" type="button">랜덤 추천</button>
+            <div class="page-indicator" id="pageIndicator"></div>
+            <div class="menu-pagination" id="menuPagination"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bowl-panel panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">DROP ZONE</p>
+            <h2>라멘 보울</h2>
+          </div>
+          <p class="drop-hint">메뉴 카드를 끌어다 놓거나 버튼으로 담아보세요</p>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="steam steam-a"></div>
+          <div class="steam steam-b"></div>
+          <div class="steam steam-c"></div>
+          <svg class="bowl-svg" viewBox="0 0 420 360" role="img" aria-label="주문 그릇">
+            <defs>
+              <linearGradient id="bowlShell" x1="0%" x2="100%">
+                <stop offset="0%" stop-color="#fcf5d6"></stop>
+                <stop offset="100%" stop-color="#edd382"></stop>
+              </linearGradient>
+              <linearGradient id="bowlShadow" x1="0%" x2="100%">
+                <stop offset="0%" stop-color="#f4442e"></stop>
+                <stop offset="100%" stop-color="#fc9e4f"></stop>
+              </linearGradient>
+            </defs>
+            <ellipse class="table-shadow" cx="210" cy="308" rx="145" ry="24"></ellipse>
+            <ellipse class="broth" id="brothFill" cx="210" cy="140" rx="128" ry="72"></ellipse>
+            <g id="ingredientLayer"></g>
+            <path class="bowl-rim" d="M80 128 C96 84 324 84 340 128"></path>
+            <path class="bowl-body" d="M90 128 C94 236 134 292 210 302 C286 292 326 236 330 128 Z"></path>
+            <path class="bowl-stripe" d="M127 208 C166 224 254 224 293 208"></path>
+            <path class="bowl-stripe" d="M140 236 C173 248 247 248 280 236"></path>
+          </svg>
+          <div class="drop-copy">
+            <p class="drop-title">BOWL READY</p>
+            <p class="drop-desc">라멘, 사이드, 음료를 담아 나만의 세트를 완성해보세요.</p>
+          </div>
+        </div>
+
+        <div class="visual-legend">
+          <div>
+            <span class="legend-dot mild"></span>
+            <span>담길수록 국물 농도 상승</span>
+          </div>
+          <div>
+            <span class="legend-dot spicy"></span>
+            <span>매운 라멘은 고추 토핑이 더해짐</span>
+          </div>
+        </div>
+
+        <div class="queue-tags" id="queueTags"></div>
+      </section>
+
+      <aside class="cart-panel panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">LIVE CART</p>
+            <h2>장바구니</h2>
+          </div>
+          <button class="text-button" id="clearCartButton" type="button">전체 비우기</button>
+        </div>
+
+        <div class="cart-list" id="cartList"></div>
+
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>총 주문 수량</span>
+            <strong id="cartCount">0개</strong>
+          </div>
+          <div class="summary-row total">
+            <span>합계</span>
+            <strong id="cartTotal">0원</strong>
+          </div>
+        </div>
+
+        <button class="order-button" id="placeOrderButton" type="button">주문 완료</button>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modal-shell hidden" id="configModal" aria-hidden="true">
+    <div class="modal-card config-card" role="dialog" aria-modal="true" aria-labelledby="configTitle">
+      <button class="modal-close" id="closeConfigButton" type="button" aria-label="옵션 창 닫기">×</button>
+      <div class="config-preview" id="configPreview"></div>
+      <div class="config-content">
+        <p class="eyebrow">CUSTOMIZE ORDER</p>
+        <h3 id="configTitle">라멘 옵션 선택</h3>
+        <div class="config-block" id="spiceBlock">
+          <div class="block-head">
+            <strong>맵기 설정</strong>
+            <span>버튼을 누르고 있는 동안 게이지가 차오릅니다</span>
+          </div>
+          <div class="spice-panel">
+            <div class="spice-emoji" id="spiceEmoji">😊</div>
+            <div class="spice-copy">
+              <p class="spice-label" id="spiceLabel">기본</p>
+              <p class="spice-status" id="spiceStatusText">게이지를 채워 원하는 맵기에서 손을 떼세요.</p>
+              <div class="spice-gauge" aria-hidden="true">
+                <div class="spice-gauge-fill" id="spiceGaugeFill"></div>
+              </div>
+              <div class="spice-controls">
+                <button class="spice-hold-button" id="spiceHoldButton" type="button">누르고 맵기 올리기</button>
+                <button class="spice-reset-button" id="resetSpiceButton" type="button">초기화</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-block">
+          <div class="block-head">
+            <strong>스프의 염도</strong>
+          </div>
+          <div class="option-row" id="saltinessOptions"></div>
+        </div>
+
+        <div class="config-block">
+          <div class="block-head">
+            <strong>면의 굵기</strong>
+          </div>
+          <div class="option-row" id="noodleThicknessOptions"></div>
+        </div>
+
+        <div class="config-block">
+          <div class="block-head">
+            <strong>면의 익힘</strong>
+          </div>
+          <div class="option-row" id="noodleFirmnessOptions"></div>
+        </div>
+
+        <div class="config-block">
+          <div class="block-head">
+            <strong>향미유의 진한 정도</strong>
+          </div>
+          <div class="option-row" id="oilOptions"></div>
+        </div>
+
+        <div class="config-block">
+          <div class="block-head">
+            <strong>추가 토핑</strong>
+            <span>원하는 만큼 선택 가능</span>
+          </div>
+          <div class="option-row topping-row" id="toppingOptions"></div>
+        </div>
+
+        <div class="modal-actions">
+          <div class="price-box">
+            <span>추가 포함 금액</span>
+            <strong id="configPrice">0원</strong>
+          </div>
+          <button class="confirm-button" id="confirmConfigButton" type="button">그릇에 담기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-shell hidden" id="resultModal" aria-hidden="true">
+    <div class="modal-card result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <button class="modal-close" id="closeResultButton" type="button" aria-label="결과 창 닫기">×</button>
+      <p class="eyebrow">ORDER COMPLETE</p>
+      <h3 id="resultTitle">주문이 접수되었습니다</h3>
+      <div class="result-list" id="resultList"></div>
+      <div class="result-total" id="resultTotal"></div>
+      <button class="confirm-button" id="closeResultAction" type="button">확인</button>
+    </div>
+  </div>
+
+  <div class="drag-ghost hidden" id="dragGhost"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
